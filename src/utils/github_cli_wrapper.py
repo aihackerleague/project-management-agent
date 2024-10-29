@@ -16,7 +16,7 @@ class GitHubCLIError(Exception):
 class GitHubCLI:
     """GitHub CLI wrapper for project and issue management"""
     
-    def __init__(self, gh_path: str = None, gh_token: Optional[str] = None):
+    def __init__(self, gh_path: str = None, gh_token: Optional[str] = None, validate: bool = True):
         """Initialize GitHub CLI wrapper"""
         gh_path = os.getenv("GITHUB_CLI_PATH", gh_path)
         if not gh_path:
@@ -27,8 +27,13 @@ class GitHubCLI:
             **os.environ,
             "GITHUB_TOKEN": gh_token or os.getenv("GITHUB_TOKEN", "")
         }
-        self._validate_cli()
-        self.username = self._get_username()
+        
+        if validate:
+            self._validate_cli()
+            self.username = self._get_username()
+        else:
+            # Skip validation for testing
+            self.username = "test-user"
         
     def _validate_cli(self):
         """Validate GitHub CLI is available and authenticated"""
