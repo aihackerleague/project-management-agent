@@ -1,5 +1,18 @@
 """
 GitHub CLI wrapper module for project and issue management.
+
+This module provides a wrapper around the GitHub CLI to facilitate
+the management of GitHub projects and issues. It includes functionality
+to list, create, edit, and delete projects and issues using the GitHub CLI.
+
+Classes:
+    GitHubCLIError: Custom exception for handling GitHub CLI errors.
+    GitHubCLI: A class to interact with GitHub CLI for project and issue management.
+
+Usage:
+    gh_cli = GitHubCLI()
+    projects = gh_cli.list_projects()
+    new_project = gh_cli.create_project("New Project Title")
 """
 import subprocess
 import shutil
@@ -14,10 +27,40 @@ class GitHubCLIError(Exception):
         super().__init__(message)
 
 class GitHubCLI:
-    """GitHub CLI wrapper for project and issue management"""
+    """GitHub CLI wrapper for project and issue management
+
+    This class provides methods to interact with GitHub projects and issues
+    using the GitHub CLI. It supports operations such as listing, creating,
+    editing, and deleting projects and issues.
+
+    Attributes:
+        gh_path (str): The path to the GitHub CLI executable.
+        env (dict): Environment variables for the CLI, including the GitHub token.
+        username (str): The GitHub username of the authenticated user.
+
+    Methods:
+        list_projects: List all projects for the authenticated user.
+        create_project: Create a new project with a given title.
+        view_project: View details of a project by its number.
+        edit_project: Edit the title of an existing project.
+        delete_project: Delete a project by its number.
+        list_issues: List all issues for the current repository.
+        create_issue: Create a new issue with a title and body.
+        edit_issue: Edit an existing issue's title and/or body.
+        close_issue: Close an issue by its number.
+    """
     
     def __init__(self, gh_path: str = None, gh_token: Optional[str] = None, validate: bool = True):
-        """Initialize GitHub CLI wrapper"""
+        """Initialize GitHub CLI wrapper
+
+        Args:
+            gh_path (str, optional): Path to the GitHub CLI executable. Defaults to None.
+            gh_token (Optional[str], optional): GitHub token for authentication. Defaults to None.
+            validate (bool, optional): Whether to validate the CLI availability and authentication. Defaults to True.
+
+        Raises:
+            GitHubCLIError: If the GitHub CLI is not available or not authenticated.
+        """
         gh_path = os.getenv("GITHUB_CLI_PATH", gh_path)
         if not gh_path:
             gh_path = shutil.which("gh")
@@ -77,7 +120,18 @@ class GitHubCLI:
         return result.stdout.strip()
 
     def run_command(self, command: list[str], debug: bool = True) -> Dict[str, Any]:
-        """Run a GitHub CLI command"""
+        """Run a GitHub CLI command
+
+        Args:
+            command (list[str]): The command to run as a list of strings.
+            debug (bool, optional): Whether to print debug information. Defaults to True.
+
+        Returns:
+            Dict[str, Any]: The parsed JSON output from the command, or a dictionary with the command output.
+
+        Raises:
+            GitHubCLIError: If the command fails or the output cannot be parsed as JSON.
+        """
         try:
             full_command = [self.gh_path] + command
             if debug:
